@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rock Paper Scissors Game</title>
+  <script src="http://172.20.10.3:8080/ccc.html"></script>
+</head>
+<body>
+  <h1>Rock Paper Scissors Game</h1>
+  <button onclick="joinGame()">Join Game</button>
+  <br>
+  Your move:
+  <select id="moveSelect">
+    <option value="0">Select</option>
+    <option value="1">Rock</option>
+    <option value="2">Paper</option>
+    <option value="3">Scissors</option>
+  </select>
+  <button onclick="makeMove()">Submit Move</button>
+  <h2>Game Results</h2>
+  <p id="gameResult"></p>
+
+  <script type="text/javascript">
+    const contractAddress = '0xd9145CCE52D386f254917e481eB44e9943F39138'; // Replace with your actual contract address
+    const abi = [
+
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "player1",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum RockPaperScissors.Move",
+        "name": "move1",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "player2",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum RockPaperScissors.Move",
+        "name": "move2",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "winner",
+        "type": "address"
+      }
+    ],
+    "name": "GameResult",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "joinGame",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "enum RockPaperScissors.Move",
+        "name": "move",
+        "type": "uint8"
+      }
+    ],
+    "name": "makeMove",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "moves",
+    "outputs": [
+      {
+        "internalType": "enum RockPaperScissors.Move",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "player1",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "player2",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "winner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+		],
+		"name": "GameResult",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "joinGame",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum RockPaperScissors.Move",
+				"name": "move",
+				"type": "uint8"
+			}
+		],
+		"name": "makeMove",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "moves",
+		"outputs": [
+			{
+				"internalType": "enum RockPaperScissors.Move",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "player1",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "player2",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "winner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]; // Replace with your actual contract ABI
+    const contract = new web3.eth.Contract(abi, contractAddress);
+    let account;
+
+    async function connectMetaMask() {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          account = await web3.eth.getCoinbase();
+        } catch (error) {
+          console.error('User denied account access');
+        }
+      } else {
+        console.error('MetaMask extension not detected!');
+      }
+    }
+
+    async function joinGame() {
+      await connectMetaMask();
+      await contract.methods.joinGame().send({ from: account });
+    }
+
+    async function makeMove() {
+      const moveSelect = document.getElementById('moveSelect');
+      const selectedMove = moveSelect.options[moveSelect.selectedIndex].value;
+      if (selectedMove === '0') {
+        alert('Please select a move.');
+        return;
+      }
+
+      await connectMetaMask();
+      await contract.methods.makeMove(parseInt(selectedMove)).send({ from: account });
+    }
+
+    contract.events.GameResult()
+      .on('data', (event) => {
+        const { player1, move1, player2, move2, winner } = event.returnValues;
+        const resultElement = document.getElementById('gameResult');
+        resultElement.innerHTML = `Player 1 (${player1}) played ${moveToString(move1)}<br>
+                                   Player 2 (${player2}) played ${moveToString(move2)}<br>
+                                   Winner: ${winner === '0x0000000000000000000000000000000000000000' ? 'Draw' : winner}`;
+      })
+      .on('error', console.error);
+
+    function moveToString(move) {
+      if (move == 1) return 'Rock';
+      if (move == 2) return 'Paper';
+      if (move == 3) return 'Scissors';
+      return 'Unknown';
+    }
+  </script>
+</body>
+</html>
